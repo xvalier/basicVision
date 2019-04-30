@@ -1,21 +1,5 @@
 import os
 import cv2
-path = '/home/xvalier/Documents/snippets_openCV/images/'
-
-#TODO: Learn to use matplotlib to display data better
-    #Includes drawing boxes, ROIs, taking in data like histograms
-
-#Currently loads images from specified path and displays in grayscale
-def main():
-    #path = os.getcwd() + '/images/'
-    images = getImages(path)
-    for image in images:
-        img = readImageGrayScale(image)
-        #name = input('what should image be called?')
-        #writeImage = writeImage(img, image)
-        displayImage(img)
-
-
 
 #Get list of all images in a given directory
 def getImages(path):
@@ -33,9 +17,11 @@ def readImageColor(file):
 def splitColorChannel(image):
     return cv2.split(image)
 
-#Display an image
+#Display an image, fitted in window
 def displayImage(imageMatrix):
-    cv2.imshow('image',imageMatrix)
+    cv2.namedWindow("Display",cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Display",600,600)
+    cv2.imshow("Display",imageMatrix)
     cv2.waitKey(0)
     cv2.destoryAllWindows()
 
@@ -48,20 +34,20 @@ def edgeDetectCanny(image, thresholdLow, thresholdHigh):
 def writeImage(path,name, image):
     cv2.imwrite(path+name, image)
 
-path = '/home/xvalier/Documents/snippets_openCV/images/'
+path = '/home/xvalier/Documents/snippets_openCV/images/Receipts/'
 tl = 50
 th = 150
 choice =0
 a = getImages(path)
 
 #Simple Edge Detection
-#b = readImageGrayScale(a[choice])
-#c = edgeDetectCanny(b,tl,th)
-#displayImage(c)
+b = readImageGrayScale(a[choice])
+c = edgeDetectCanny(b,tl,th)
+displayImage(c)
 
 #Color Splitting
-b = readImageColor(a[choice])
-b,g,r = splitColorChannel(b)
-displayImage(b)
-displayImage(g)
-displayImage(r)
+#b = readImageColor(a[choice])
+#b,g,r = splitColorChannel(b)
+#displayImage(b)
+#displayImage(g)
+#displayImage(r)
