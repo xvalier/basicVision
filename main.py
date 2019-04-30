@@ -1,5 +1,25 @@
 import os
 import cv2
+path = '/home/xvalier/Documents/snippets_openCV/images/Receipts/'
+tl = 50
+th = 150
+choice =0
+
+#Steps to take
+#1) Receipt Orientation and Extraction
+#2) Blob Detection via 'Morphological Close' + Threshold
+    #Find edges of receipt (via Edge Detection on BLOB)
+    #Calculate angle
+    #ROI Extraction of ORIGINAL Receipt
+    #Linear Rotation Transformation of ORIGINAL receipt
+#3) OTSU Thresholding (Binarization)
+#4) OCR Recognition (maybe using Tessaract)
+#5) Extraction of OCR Strings (which are readable)
+
+def main(path, tl, th, choice):
+    a = getImages(path)
+    b = readImageGrayScale(a[choice])
+    c = extractReceipt(b)
 
 #Get list of all images in a given directory
 def getImages(path):
@@ -11,12 +31,6 @@ def getImages(path):
 def readImageGrayScale(file):
     return cv2.imread(file, 0)
 
-def readImageColor(file):
-    return cv2.imread(file)
-
-def splitColorChannel(image):
-    return cv2.split(image)
-
 #Display an image, fitted in window
 def displayImage(imageMatrix):
     cv2.namedWindow("Display",cv2.WINDOW_NORMAL)
@@ -24,6 +38,21 @@ def displayImage(imageMatrix):
     cv2.imshow("Display",imageMatrix)
     cv2.waitKey(0)
     cv2.destoryAllWindows()
+
+#Find receipt object from background and extract it
+def extractReceipt(rawImage):
+
+
+
+
+
+
+#Un-used snippets---------------------------------------------------------------
+def readImageColor(file):
+    return cv2.imread(file)
+
+def splitColorChannel(image):
+    return cv2.split(image)
 
 #Canny Edge Detector
 def edgeDetectCanny(image, thresholdLow, thresholdHigh):
@@ -33,21 +62,3 @@ def edgeDetectCanny(image, thresholdLow, thresholdHigh):
 #Write image array to specified file
 def writeImage(path,name, image):
     cv2.imwrite(path+name, image)
-
-path = '/home/xvalier/Documents/snippets_openCV/images/Receipts/'
-tl = 50
-th = 150
-choice =0
-a = getImages(path)
-
-#Simple Edge Detection
-b = readImageGrayScale(a[choice])
-c = edgeDetectCanny(b,tl,th)
-displayImage(c)
-
-#Color Splitting
-#b = readImageColor(a[choice])
-#b,g,r = splitColorChannel(b)
-#displayImage(b)
-#displayImage(g)
-#displayImage(r)
