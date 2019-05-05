@@ -1,9 +1,80 @@
 import os
 import cv2
-path = '/home/xvalier/Documents/snippets_openCV/images/Receipts/'
-tl = 50
-th = 150
-choice =0
+import numpy as np
+from matplotlib import pyplot as plot
+
+#Choose test image
+path = os.getcwd() + '/images/'
+file = 'Receipt.jpg'
+name = path + file
+
+#Import image
+image = cv2.imread(name, 1) #Import image in grayscale
+
+#General display
+cv2.namedWindow('Window-1',cv2.WINDOW_NORMAL)
+cv2.imshow('Window-1',image)
+k = cv2.waitKey(0) & 0xFF
+if k == 27:                                     #Quit if ESC is pressed
+    cv2.destroyAllWindows()
+elif k == ord('s'):                             #Save and quit if 's' is pressed
+    cv2.imwrite(path+file+'01',image)
+    cv2.destroyAllWindows()
+
+#Display through matplotlib
+plot.imshow(image, cmap = 'gray', interpolation = 'bicubic')
+plot.xticks([]), plot.yticks([])                  #Hide ticks
+plot.show()
+
+#APPLICATION----------------use sliders to change image contents
+import os
+import cv2
+import numpy as np
+from matplotlib import pyplot as plot
+
+#Choose test image
+path = os.getcwd() + '/images/'
+file = 'Receipt.jpg'
+name = path + file
+scaleFactor = .25
+windowName = 'Window-2'
+
+image = cv2.imread(name, 1) #Import image in grayscale
+def nothing(x):
+    pass
+cv2.namedWindow(windowName,cv2.WINDOW_NORMAL)
+cv2.createTrackbar('R',windowName,0,255,nothing)
+cv2.createTrackbar('G',windowName,0,255,nothing)
+cv2.createTrackbar('B',windowName,0,255,nothing)
+
+# create switch for ON/OFF functionality
+switch = '0 : OFF \n1 : ON'
+cv2.createTrackbar(switch, windowName,0,1,nothing)
+
+while(1):
+    height = floor(image.shape[0] * scaleFactor)
+    width = floor(image.shape[0] * scaleFactor)
+    resizedImage = cv2.resize(image, (height, width))
+    cv2.imshow(windowName,image)
+    k = cv2.waitKey(1) & 0xFF
+    if k == 27:
+        break
+    # get current positions of four trackbars
+    r = cv2.getTrackbarPos('R',windowName)
+    g = cv2.getTrackbarPos('G',windowName)
+    b = cv2.getTrackbarPos('B',windowName)
+    s = cv2.getTrackbarPos(switch,windowName)
+    if s == 0:
+        image[:] = 0
+    else:
+        image[:] = [b,g,r]
+
+cv2.destroyAllWindows()
+
+
+
+
+
 
 #Steps to take
 #1) Receipt Orientation and Extraction
@@ -15,6 +86,16 @@ choice =0
 #3) OTSU Thresholding (Binarization)
 #4) OCR Recognition (maybe using Tessaract)
 #5) Extraction of OCR Strings (which are readable)
+
+
+
+
+tl = 50
+th = 150
+choice =0
+
+
+
 
 def main(path, tl, th, choice):
     a = getImages(path)
