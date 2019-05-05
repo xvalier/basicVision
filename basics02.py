@@ -4,6 +4,7 @@
     #Putting logo on another image via bitwise masking
     #Timers to clock CV performance
     #Zero-padding/borders
+    #Basic changing of color spaces
 
 import os
 import cv2
@@ -105,3 +106,9 @@ class timeCV:
 #timeCV.stop()
 #performance = timeCV.getTime()
 #--------------------------------------------
+
+
+#Converting between color spaces
+image = cv2.imread(name, 1)
+newImage = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  #To Grayscale
+newImage = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)   #To HSV
