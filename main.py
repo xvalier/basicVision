@@ -1,79 +1,76 @@
-import os
-import cv2
-import numpy as np
-from matplotlib import pyplot as plot
-
-#Choose test image
-path = os.getcwd() + '/images/'
-file = 'Receipt.jpg'
-name = path + file
-
-#Import image
-image = cv2.imread(name, 1) #Import image in grayscale
-
-#General display
-cv2.namedWindow('Window-1',cv2.WINDOW_NORMAL)
-cv2.imshow('Window-1',image)
-k = cv2.waitKey(0) & 0xFF
-if k == 27:                                     #Quit if ESC is pressed
-    cv2.destroyAllWindows()
-elif k == ord('s'):                             #Save and quit if 's' is pressed
-    cv2.imwrite(path+file+'01',image)
-    cv2.destroyAllWindows()
-
-#Display through matplotlib
-plot.imshow(image, cmap = 'gray', interpolation = 'bicubic')
-plot.xticks([]), plot.yticks([])                  #Hide ticks
-plot.show()
-
 #APPLICATION----------------use sliders to change image contents
 import os
 import cv2
 import numpy as np
 from matplotlib import pyplot as plot
 
-#Choose test image
+#Choose test image based on path
 path = os.getcwd() + '/images/'
 file = 'Receipt.jpg'
 name = path + file
-scaleFactor = .25
-windowName = 'Window-2'
 
-image = cv2.imread(name, 1) #Import image in grayscale
+#Other Parameters
+scaleFactor = .25
+windowName  = 'Window-3'
+controlName = 'Controls'
+
+#Import image and then resize based on scale factor
+image = cv2.imread(name, 1)
+height = int(image.shape[0] * scaleFactor)
+width  = int(image.shape[1] * scaleFactor)
+resizedImage = cv2.resize(image, (height, width))
+#Create window to display image
+cv2.namedWindow(windowName)#,cv2.WINDOW_NORMAL)
+
+#Sliders for color channels
 def nothing(x):
     pass
-cv2.namedWindow(windowName,cv2.WINDOW_NORMAL)
-cv2.createTrackbar('R',windowName,0,255,nothing)
-cv2.createTrackbar('G',windowName,0,255,nothing)
-cv2.createTrackbar('B',windowName,0,255,nothing)
+#cv2.createTrackbar('R',windowName,0,255,nothing)
+#cv2.createTrackbar('G',windowName,0,255,nothing)
+#cv2.createTrackbar('B',windowName,0,255,nothing)
 
-# create switch for ON/OFF functionality
-switch = '0 : OFF \n1 : ON'
-cv2.createTrackbar(switch, windowName,0,1,nothing)
+#Switch for grayscale vs color
+cv2.namedWindow(controlName)
+cv2.createTrackbar('Red', controlName,0,1,nothing)
+cv2.createTrackbar('Blue', controlName,0,1,nothing)
+cv2.createTrackbar('Green', controlName,0,1,nothing)
 
+#Continually refresh image in window
 while(1):
-    height = floor(image.shape[0] * scaleFactor)
-    width = floor(image.shape[0] * scaleFactor)
-    resizedImage = cv2.resize(image, (height, width))
+    #Use controlBox to choose color channels that are output
+    cv2.imshow(controlName, np.zeros((100,100,1), np.uint8))
+    switches = {}
+    switches['Blue'] = cv2.getTrackbarPos('OnlyBlue', controlName)
+    switches['Green'] = cv2.getTrackbarPos('OnlyGreen', controlName)
+    switches['Red'] = cv2.getTrackbarPos('OnlyRed', controlName)
+    image    = colorChannels(resizedImage, switches)
     cv2.imshow(windowName,image)
+    #Controls to close window and save image based on key strokes
     k = cv2.waitKey(1) & 0xFF
-    if k == 27:
+    if k == 27:            #Quit if ESC is pressed
+        cv2.destroyAllWindows()
         break
-    # get current positions of four trackbars
-    r = cv2.getTrackbarPos('R',windowName)
-    g = cv2.getTrackbarPos('G',windowName)
-    b = cv2.getTrackbarPos('B',windowName)
-    s = cv2.getTrackbarPos(switch,windowName)
-    if s == 0:
-        image[:] = 0
-    else:
-        image[:] = [b,g,r]
+    elif k == ord('s'):   #Save and quit if 's' is pressed
+        cv2.imwrite(path+file+'01',image)
 
-cv2.destroyAllWindows()
-
-
+def colorChannels(image, switches):
+    if switches['Blue'] == 0:
+        image[:,:,0] = 0
+    if switches['Green'] == 0:
+        image[:,:,1] = 0
+    if switches['Red'] == 0:
+        image[:,:,2] = 0
+    return image
 
 
+
+
+
+#-----------------------------------------------------------------
+#Display through matplotlib
+plot.imshow(image, cmap = 'gray', interpolation = 'bicubic')
+plot.xticks([]), plot.yticks([])                  #Hide ticks
+plot.show()
 
 
 #Steps to take
