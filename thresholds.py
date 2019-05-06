@@ -94,7 +94,6 @@ def simpleThreshold(image, parameters):
     #Perform threshold
     ret, thresholdImage = cv2.threshold(newImage, threshold, 255, thresholdType)
     thresholdImage = cv2.cvtColor(thresholdImage, cv2.COLOR_GRAY2BGR)
-    thresholdImage.shape
     return thresholdImage
 
 #'Local Relative Neighborhood Thresholding', better for inconsistent lighting
@@ -162,3 +161,5 @@ def ostuValue(image):
             fnMin = fn
             threshold = i
     return threshold
+
+main(name)

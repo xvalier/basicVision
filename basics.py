@@ -68,3 +68,5 @@ def colorChannels(image, switches):
     if switches['Red'] == 0:
         newImage[:,:,2] = 0
     return newImage
+
+main(name)
