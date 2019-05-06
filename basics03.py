@@ -2,7 +2,7 @@
     #ControlBox with min/max for HSV
     #Shows before, after, and mask images all in one window
     #Masking, BGR to HSV color conversion
-
+    
 import os
 import cv2
 import numpy as np
