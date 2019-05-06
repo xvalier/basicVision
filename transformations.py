@@ -7,6 +7,7 @@
 import os
 import cv2
 import numpy as np
+from math import cos, sin
 
 #Choose test image based on path
 file = 'Receipt.jpg'
@@ -24,7 +25,6 @@ def main(name):
     #Create windows for image display and controls
     cv2.namedWindow(windowName)
     sliders = createTransformationControl(controlName)
-    refresh = True
     while(1):
         #Use controlBox to choose color channels that are output
         parameters = getTransformationControl(controlName, sliders)
@@ -59,11 +59,11 @@ def createTransformationControl(controlName):
     cv2.namedWindow(controlName)
     cv2.createTrackbar('ScalingX', controlName, 0,255,nothing)
     cv2.createTrackbar('ScalingY', controlName, 0,255,nothing)
-    cv2.createTrackbar('TranslationX', controlName,2000,nothing)
-    cv2.createTrackbar('TranslationY', controlName,,2000,nothing)
+    cv2.createTrackbar('TranslationX', controlName,0,2000,nothing)
+    cv2.createTrackbar('TranslationY', controlName,0,2000,nothing)
     cv2.createTrackbar('Rotation', controlName,0,360,nothing)
-    cv2.createTrackbar('ShearX', controlName,2000,nothing)
-    cv2.createTrackbar('ShearY', controlName,,2000,nothing)
+    cv2.createTrackbar('ShearX', controlName,0,2000,nothing)
+    cv2.createTrackbar('ShearY', controlName,0,2000,nothing)
     cv2.imshow(controlName, np.zeros((100,700,1), np.uint8))
     sliders = ['ScalingX','ScalingY', 'TranslationX',
         'TranslationY', 'Rotation', 'ShearX', 'ShearY']
@@ -78,18 +78,26 @@ def getTransformationControl(controlName, sliders):
     return parameters
 
 #TODO:Find how to put all values in 2x3 M matrix
+#TODO:Only rotation working now
+#TODO:Rotation is not centered at origin
+#
 def transformationProcess(image, parameters):
     newImage = np.copy(image)
     #Extract scaling Parameters
-    sx = parameters['ScalingX']
-    sy = parameters['ScalingY']
+    sx = max(parameters['ScalingX'],1)
+    sy = max(parameters['ScalingY'],1)
     tx = parameters['TranslationX']
     ty = parameters['TranslationY']
     r  = parameters['Rotation']
     shx = parameters['ShearX']
     shy = parameters['ShearY']
     #Create transformation matrix
-    M  = np.float32([sx*cos(r), -1*shx*sin(r), tx], [shy*sin(r), sy*cos(r), ty])
-    cols, rows = newImage.shape
-    newImage = cv2.warpAffine(newImage, M, (cols, rows))
+    M  = np.float32([[sx, shx, tx], [sy,shy, ty]])
+    #Rotation matrix needs special function to scale
+    cols= newImage.shape[0]
+    rows= newImage.shape[1]
+    Mr = cv2.getRotationMatrix2D((cols,rows), r, 1)
+    #Combine all transformations via scalar multiplication
+    M  = np.multiply(Mr, M)
+    newImage = cv2.warpAffine(newImage, M, (rows, cols))
     return newImage

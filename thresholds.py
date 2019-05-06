@@ -24,7 +24,6 @@ def main(name):
     #Create windows for image display and controls
     cv2.namedWindow(windowName)
     sliders = createThresholdControl(controlName)
-    refresh = True
     while(1):
         #Use controlBox to choose color channels that are output
         parameters = getThresholdControl(controlName, sliders)
