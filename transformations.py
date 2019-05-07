@@ -7,6 +7,7 @@
 import os
 import cv2
 import numpy as np
+import math
 from math import cos, sin
 
 #Choose test image based on path
@@ -83,21 +84,29 @@ def getTransformationControl(controlName, sliders):
 #
 def transformationProcess(image, parameters):
     newImage = np.copy(image)
+    rows = newImage.shape[0]
+    cols = newImage.shape[1]
     #Extract scaling Parameters
-    sx = max(parameters['ScalingX'],1)
-    sy = max(parameters['ScalingY'],1)
+    sx = parameters['ScalingX']+1
+    sy = parameters['ScalingY']+1
     tx = parameters['TranslationX']
     ty = parameters['TranslationY']
     r  = parameters['Rotation']
-    shx = parameters['ShearX']
-    shy = parameters['ShearY']
-    #Create transformation matrix
-    M  = np.float32([[sx, shx, tx], [sy,shy, ty]])
-    #Rotation matrix needs special function to scale
-    cols= newImage.shape[0]
-    rows= newImage.shape[1]
-    Mr = cv2.getRotationMatrix2D((cols,rows), r, 1)
-    #Combine all transformations via scalar multiplication
-    M  = np.multiply(Mr, M)
-    newImage = cv2.warpAffine(newImage, M, (rows, cols))
+    shx = parameters['ShearX']+1
+    shy = parameters['ShearY']+1
+    M = getMatrix(sx, sy, tx, ty, r, shx, shy, cols, rows)
+    newImage = cv2.warpAffine(newImage, M, (cols, rows))
     return newImage
+
+def getMatrix(sx, sy, tx, ty, r, shx, shy, cols, rows):
+    #Rotate around middle of image rather than origin
+    originX = cols/2
+    originY = rows/2
+    Mr = cv2.getRotationMatrix2D((originX,originY), r, 1)
+    #Combine shear/scale transformations with rotation via scalar multiplication
+    Mss   = np.float32([[sx, shx, 1], [sy,shy, 1]])
+    Mrss  = np.multiply(Mr, Mss)
+    #Combine translations with other operations via addition
+    Mt    = np.float32([[0,0,tx],[0,0,ty]])
+    M     = np.add(Mrss, Mt)
+    return M
