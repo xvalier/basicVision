@@ -1,9 +1,5 @@
-
 #This application uses code from basic01. New things it does:
-    #ControlBox with threshold parameters
-    #Shows before, after for thresholding functions
-    #Simple/Adaptive/OSTU Thresholding is implemented
-
+    #Performs simple transformations (shear, scale, rotate, translate)
 import os
 import cv2
 import numpy as np
@@ -78,10 +74,6 @@ def getTransformationControl(controlName, sliders):
         parameters[n] = value
     return parameters
 
-#TODO:Find how to put all values in 2x3 M matrix
-#TODO:Only rotation working now
-#TODO:Rotation is not centered at origin
-#
 def transformationProcess(image, parameters):
     newImage = np.copy(image)
     rows = newImage.shape[0]
