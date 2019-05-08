@@ -17,8 +17,22 @@ processedImage = cv2.Canny(original,tLow,tHigh)
 #CONTOUR DETECTION AND DISPLAY--------------------------------------------------
 #Contours are object boundaries (perimeters of a blob)
 #Below is similar to boundary following algorithm
-#4th argument in findContours is approx method, which is like polyfitting (compressing # of points)
-#contours output is a list of contours. Each contour is a list of x,y boundary points 
-imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
-ret,thresh = cv2.threshold(imgray,127,255,0)
-image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    #4th argument in findContours is approx method, which is like polyfitting (compressing # of points)
+    #contours output is a list of contours. Each contour is a list of x,y boundary points
+#Before finding contours, it is necessary to get a grayscale binary image (only black and white)
+grayscaleImage = cv2.cvtColor(original,cv2.COLOR_BGR2GRAY)
+ret,binaryImage = cv2.threshold(grayscaleImage,127,255,0)
+image, contours, hierarchy = cv2.findContours(binaryImage,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+#Draw all contours on image
+newImage = cv2.drawContours(image, contours, -1, (0,255,0), 3)
+#Draw a specific contour on image based on index
+newImage = cv2.drawContours(image, contours, 3, (0,255,0), 3)
+#After detecting contour, extract properties for each (blob parameters)
+contour = contours[3]
+cnt = contours[0]
+M = cv2.moments(cnt)
+print M
+cx = int(M['m10']/M['m00'])
+cy = int(M['m01']/M['m00'])
+area = cv2.contourArea(cnt)
+perimeter = cv2.arcLength(cnt,True)

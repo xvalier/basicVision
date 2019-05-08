@@ -53,16 +53,33 @@ scharry = cv2.Sobel(img,cv2.CV_64F,0,1,ksize=kernelSize)
 #Laplacian Filter is a sum of 2nd derivatives in X and Y direction
 laplacian = cv2.Laplacian(original,cv2.CV_64F)
 
-#CANNY EDGE DETECTION-----------------------------------------------------------
-#Procedure for this is below:
-#1) 5x5 Gaussian Filter to remove noise
-#2) Get 1st Derivatives Gx and Gy
-#3) Obtain Magnitude M = sqrt(Gx^2 +Gy^2) and Angle theta = atan(Gx/Gy)
-#4) Nonminima Suppression -> keep only maxima/peaks
-#5) Hysterisis Threshold, user selects thresholds tHigh and tLow
-    #if above tHigh -> edge
-    #if below tLow  -> not edge
-    #if between tHigh and tLow -> edge only if near other edge points
-tLow  = 100
-tHigh = 200
-processedImage = cv2.Canny(original,tLow,tHigh)
+
+#FOURIER TRANSFORMS-------------------------------------------------------------
+#CONCEPT
+#If a 'signal' varies in amplitude (intensity) a lot, it is high frequency
+#If a 'signal' varies slowly or not much, it is low frequency
+#For images, noises and edges are 'high frequency'
+#The general 'outline' is low frequency
+#Should have array size of 2s,3s,or 5s. Zeropad to get this in OpenCV
+
+#Found optimal array size to compute DFT efficiently
+rows, cols = original.shape[0:2]
+optimalRows = cv2.getOptimalDFTSize(rows)
+optimalCols = cv2.getOptimalDFTSize(cols)
+#ZeroPad the image to make it the optimal array size
+horizPad = optimalCols - cols
+vertPad   = optimalRows - rows
+paddedImage   = cv2.copyMakeBorder(original, 0, vertPad, 0, horizPad,cv2.BORDER_CONSTANT, value = 0)
+#Perform 2D DFT on padded image
+spectrum = cv2.dft(np.float32(paddedImage),flags = cv2.DFT_COMPLEX_OUTPUT)
+#Shift spectrum so that low freq portions are in center of image
+shiftedSpectrum = np.fft.fftshift(spectrum)
+#Create a simple high pass filter in frequency domain
+originX,originY = rows/2 , cols/2
+filt = np.zeros((rows,cols,2),np.uint8)
+filt[originX-30:originX+30, originY-30:originY+30] = 1
+#Apply filter, then shift it back to 'normal position'
+filteredSpectrum = shiftedSpectrum*filt
+filteredSpectrum = np.fft.ifftshift(filteredSpectrum)
+#Perform 2D inverse DFT
+filteredImage = cv2.idft(filteredSpectrum)
