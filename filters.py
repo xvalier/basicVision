@@ -61,15 +61,19 @@ laplacian = cv2.Laplacian(original,cv2.CV_64F)
 #For images, noises and edges are 'high frequency'
 #The general 'outline' is low frequency
 #Should have array size of 2s,3s,or 5s. Zeropad to get this in OpenCV
+#Also NOTE --> 2D Convolution is same as 'sliding window through image'
+    #Thus the sliding window function can be done faster by 'multiplying in the frequency domain'
 
-#Found optimal array size to compute DFT efficiently
-rows, cols = original.shape[0:2]
+#Convert image to grayscale
+grayImage = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
+#Find optimal array size to compute DFT efficiently
+rows, cols = grayImage.shape
 optimalRows = cv2.getOptimalDFTSize(rows)
 optimalCols = cv2.getOptimalDFTSize(cols)
 #ZeroPad the image to make it the optimal array size
 horizPad = optimalCols - cols
 vertPad   = optimalRows - rows
-paddedImage   = cv2.copyMakeBorder(original, 0, vertPad, 0, horizPad,cv2.BORDER_CONSTANT, value = 0)
+paddedImage   = cv2.copyMakeBorder(grayImage, 0, vertPad, 0, horizPad,cv2.BORDER_CONSTANT, value = 0)
 #Perform 2D DFT on padded image
 spectrum = cv2.dft(np.float32(paddedImage),flags = cv2.DFT_COMPLEX_OUTPUT)
 #Shift spectrum so that low freq portions are in center of image
