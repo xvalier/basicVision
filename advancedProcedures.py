@@ -30,10 +30,6 @@ tHigh = 200
 processedImage = cv2.Canny(original,tLow,tHigh)
 
 #TEMPLATE MATCHING--------------------------------------------------------------
-import cv2
-import numpy as np
-from matplotlib import pyplot as plt
-
 img = cv2.imread('messi5.jpg',0)
 img2 = img.copy()
 template = cv2.imread('template.jpg',0)
@@ -96,11 +92,6 @@ cv2.imwrite('res.png',img_rgb)
 #4) Threshold to get segmented objects
 #5) Label markers
 #6) Perform watershed
-
-
-import numpy as np
-import cv2
-from matplotlib import pyplot as plt
 
 img = cv2.imread('coins.png')
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
