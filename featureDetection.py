@@ -139,3 +139,25 @@ orb = cv2.ORB()
 keypoints = orb.detect(img,None) #Include Mask if needed
 keypoints, descriptors = orb.compute(img, keypoints)
 img2 = cv2.drawKeypoints(img,keypoints,color=(0,255,0), flags=0)
+
+#BF Matching (Finds a 'feature' image within an object image using keypoint descriptors)
+import numpy as np
+import cv2
+from matplotlib import pyplot as plt
+
+#Images don't exist
+img = cv2.imread('feature.jpg',0)
+img2= cv2.imread('object.jpg',0)
+
+orb = cv2.ORB()
+keypoints, descriptors = orb.detectAndCompute(img,None) #Include Mask if needed
+keypoints2, descriptors2 = orb.detectAndCompute(img2,None) #Include Mask if needed
+
+# create BFMatcher object
+bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+matches = bf.match(descriptors,descriptors2)            #Find matches
+matches = sorted(matches, key = lambda x:x.distance)    #Sort by distance
+img3 = cv2.drawMatches(img1,kp1,img2,kp2,matches[:10], flags=2) #Draw first 10
+#Can use FLANN matcher for faster results, learn later
+
+#Learn all other concepts later
